@@ -88,7 +88,7 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
                         <div className="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[8px] font-bold border border-purple-500/30 shrink-0">
                             {task.user.name?.[0]?.toUpperCase() || "U"}
                         </div>
-                        <span className="truncate">{task.user.name.split(' ')[0]}</span>
+                        <span className="truncate">{task.user.name?.split(' ')[0] || "Usuário"}</span>
                     </div>
                 )}
             </div>

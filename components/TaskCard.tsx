@@ -137,6 +137,5 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
                 )}
             </div>
         </div>
-        </div >
     );
 }

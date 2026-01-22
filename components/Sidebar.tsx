@@ -21,6 +21,7 @@ export default function Sidebar({ user, className, onLinkClick }: { user: any, c
             {/* Navigation */}
             <nav className="flex-1 space-y-2">
                 <NavItem href="/" icon={LayoutDashboard} label="Tarefas / Board" onClick={onLinkClick} />
+                <NavItem href="/tasks/team" icon={Users} label="Tarefas da Equipe" onClick={onLinkClick} />
 
                 {(user?.role === 'ADMIN') && (
                     <>

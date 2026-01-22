@@ -3,25 +3,51 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 
 // GET: Fetch tasks based on Role and Team
-export async function GET() {
+export async function GET(req: Request) {
     try {
         const session = await auth();
         if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         const { role, teamId, id: userId } = session.user;
 
-        let whereClause: any = { userId }; // Default: Only own tasks
+        // Parse query params for filtering
+        const url = new URL(req.url);
+        const filter = url.searchParams.get("filter"); // 'me' | 'team'
 
-        if (role === 'ADMIN') {
-            whereClause = {}; // Admin sees all
-        } else if (teamId) {
-            // Collaborator with team: Own tasks + Team members' tasks
-            whereClause = {
-                OR: [
-                    { userId },
-                    { user: { teamId } }
-                ]
-            };
+        let whereClause: any = {};
+
+        if (filter === 'me') {
+            // "My Tasks": Only tasks assigned to me or created by me (if distinct?) 
+            // Usually "My Tasks" = tasks assigned to the user.
+            whereClause = { userId };
+        } else if (filter === 'team') {
+            // "Team Tasks": All tasks belonging to the user's team, EXCEPT their own?
+            // Or ALL team tasks including theirs? 
+            // Request says: "team tasks ... appear separately from collaborator tasks"
+            // Typically "Team Board" shows everyone's tasks. "My Tasks" shows mine.
+
+            if (teamId) {
+                whereClause = {
+                    user: { teamId: teamId }
+                };
+            } else {
+                // No team? Empty list for team view
+                return NextResponse.json([]);
+            }
+        } else {
+            // Default/Fallback Logic (Backwards compatibility)
+            if (role === 'ADMIN') {
+                whereClause = {};
+            } else if (teamId) {
+                whereClause = {
+                    OR: [
+                        { userId },
+                        { user: { teamId } }
+                    ]
+                };
+            } else {
+                whereClause = { userId };
+            }
         }
 
         let tasks = await prisma.task.findMany({

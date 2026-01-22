@@ -21,7 +21,7 @@ export default function Home() {
   // Fetch Tasks
   const fetchTasks = async () => {
     try {
-      const res = await fetch("/api/tasks");
+      const res = await fetch("/api/tasks?filter=me");
       const data = await res.json();
       setTasks(data);
     } catch (error) {

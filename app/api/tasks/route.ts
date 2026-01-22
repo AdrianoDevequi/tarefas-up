@@ -2,33 +2,47 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 
-// GET: Fetch all tasks
+// GET: Fetch tasks based on Role and Team
 export async function GET() {
     try {
         const session = await auth();
         if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const { role, teamId, id: userId } = session.user;
+
+        let whereClause: any = { userId }; // Default: Only own tasks
+
+        if (role === 'ADMIN') {
+            whereClause = {}; // Admin sees all
+        } else if (teamId) {
+            // Collaborator with team: Own tasks + Team members' tasks
+            whereClause = {
+                OR: [
+                    { userId },
+                    { user: { teamId } }
+                ]
+            };
+        }
 
         let tasks = await prisma.task.findMany({
-            where: { userId: session.user.id },
+            where: whereClause,
             orderBy: { createdAt: "desc" },
+            include: {
+                user: {
+                    select: { name: true, image: true }
+                }
+            }
         });
 
         // Auto-migration for legacy tasks (Single user migration)
-        if (tasks.length === 0) {
-            const unassignedCount = await prisma.task.count({ where: { userId: null } });
-            if (unassignedCount > 0) {
-                await prisma.task.updateMany({
-                    where: { userId: null },
-                    data: { userId: session.user.id },
-                });
-                // Refetch after migration
-                tasks = await prisma.task.findMany({
-                    where: { userId: session.user.id },
-                    orderBy: { createdAt: "desc" },
-                });
-            }
+        if (tasks.length === 0 && role === 'ADMIN') { // Only run migration if admin/safe? actually logic was for single user. stick to keep it safe.
+            // Keeping original logic but wrapped safely or removed if deemed obsolete. 
+            // Logic: if 0 tasks found for user, maybe check for nulls?
+            // Given RBAC, legacy migration is tricky. 
+            // IF context was "single user app becoming multi user", 
+            // we might assume old tasks belong to the first user (who is likely admin).
+            // Let's keep existing simpler migration if logical, or remove it to avoid side effects.
+            // I will COMMENT OUT the legacy migration for now to avoid accidental reassignment in a multi-user context.
         }
 
         return NextResponse.json(tasks);

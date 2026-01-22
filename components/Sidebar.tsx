@@ -24,7 +24,7 @@ export default function Sidebar({ user, className, onLinkClick }: { user: any, c
                 <NavItem href="/lembretes" icon={Bell} label="Lembretes" onClick={onLinkClick} />
                 <NavItem href="/agenda" icon={Calendar} label="Agenda" onClick={onLinkClick} />
                 <NavItem href="/reports" icon={BarChart3} label="Relatórios" onClick={onLinkClick} />
-                <NavItem href="#" icon={Users} label="Equipe" onClick={onLinkClick} />
+                <NavItem href="/admin/users" icon={Users} label="Equipe" onClick={onLinkClick} />
                 <NavItem href="/configuracoes" icon={Settings} label="Configurações" onClick={onLinkClick} />
             </nav>
 
@@ -42,7 +42,9 @@ export default function Sidebar({ user, className, onLinkClick }: { user: any, c
                         </div>
                         <div className="flex flex-col min-w-0 text-left">
                             <span className="text-sm font-medium text-foreground truncate">{user?.name || "Usuário"}</span>
-                            <span className="text-xs text-muted-foreground truncate">{user?.email || ""}</span>
+                            <span className="text-xs text-muted-foreground truncate capitalize">
+                                {user?.role === 'ADMIN' ? 'Administrador' : 'Colaborador'}
+                            </span>
                         </div>
                     </Link>
 

@@ -9,9 +9,26 @@ import bcrypt from "bcryptjs"
 const prisma = new PrismaClient()
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
-    adapter: PrismaAdapter(prisma),
+    adapter: PrismaAdapter(prisma) as any,
     session: { strategy: "jwt" },
     ...authConfig,
+    callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.role = user.role;
+                token.teamId = user.teamId;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            if (session.user) {
+                session.user.id = token.sub!;
+                session.user.role = token.role;
+                session.user.teamId = token.teamId;
+            }
+            return session;
+        }
+    },
     providers: [
         Credentials({
             async authorize(credentials) {

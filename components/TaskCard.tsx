@@ -53,44 +53,47 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
             )}
 
             <div className="flex flex-col gap-2 mt-auto w-full">
-                <div className="flex items-center gap-2 flex-wrap">
-                    {/* Date Tag */}
-                    <div
-                        className={`
-                            flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium
-                            ${isOverdue ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors"}
-                        `}
-                    >
-                        <Calendar size={14} />
-                        <span>
-                            {format(dueDate, "d 'de' MMM", { locale: ptBR })}
-                        </span>
+                <div className="flex items-center gap-2 flex-wrap justify-between w-full">
+                    {/* Tags Container */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                        {/* Date Tag */}
+                        <div
+                            className={`
+                                flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium
+                                ${isOverdue ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors"}
+                            `}
+                        >
+                            <Calendar size={14} />
+                            <span>
+                                {format(dueDate, "d 'de' MMM", { locale: ptBR })}
+                            </span>
+                        </div>
+
+                        {/* Time Tag */}
+                        {task.estimatedTime && (
+                            <div className={`
+                                flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border
+                                ${task.estimatedTime === 'Rápido' ? 'bg-green-500/10 text-green-500 border-green-500/20' : ''}
+                                ${task.estimatedTime === 'Mediano' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : ''}
+                                ${task.estimatedTime === 'Demorado' ? 'bg-red-500/10 text-red-500 border-red-500/20' : ''}
+                                ${!['Rápido', 'Mediano', 'Demorado'].includes(task.estimatedTime) ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : ''}
+                            `}>
+                                <Clock size={12} />
+                                {task.estimatedTime}
+                            </div>
+                        )}
                     </div>
 
-                    {/* Time Tag - Moved here for side-by-side layout */}
-                    {task.estimatedTime && (
-                        <div className={`
-                            flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border
-                            ${task.estimatedTime === 'Rápido' ? 'bg-green-500/10 text-green-500 border-green-500/20' : ''}
-                            ${task.estimatedTime === 'Mediano' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : ''}
-                            ${task.estimatedTime === 'Demorado' ? 'bg-red-500/10 text-red-500 border-red-500/20' : ''}
-                            ${!['Rápido', 'Mediano', 'Demorado'].includes(task.estimatedTime) ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : ''}
-                        `}>
-                            <Clock size={12} />
-                            {task.estimatedTime}
+                    {/* Responsible User Indicator */}
+                    {task.user && (
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary/50 border border-border/50 text-xs text-muted-foreground max-w-[120px]" title={`Responsável: ${task.user.name || "Usuário"}`}>
+                            <div className="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[8px] font-bold border border-purple-500/30 shrink-0">
+                                {task.user.name?.[0]?.toUpperCase() || "U"}
+                            </div>
+                            <span className="truncate">{task.user.name?.split(' ')[0] || "Usuário"}</span>
                         </div>
                     )}
                 </div>
-
-                {/* Responsible User Indicator */}
-                {task.user && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary/50 border border-border/50 text-xs text-muted-foreground max-w-[120px]" title={`Responsável: ${task.user.name || "Usuário"}`}>
-                        <div className="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[8px] font-bold border border-purple-500/30 shrink-0">
-                            {task.user.name?.[0]?.toUpperCase() || "U"}
-                        </div>
-                        <span className="truncate">{task.user.name?.split(' ')[0] || "Usuário"}</span>
-                    </div>
-                )}
             </div>
 
             {/* Quick Actions - Always visible on mobile (touch), hover on desktop */}

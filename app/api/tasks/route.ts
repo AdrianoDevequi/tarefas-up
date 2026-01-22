@@ -191,10 +191,13 @@ export async function DELETE(req: Request) {
 
         if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
-        // Ensure ownership
+        // Ensure ownership OR Admin
         const existing = await prisma.task.findUnique({ where: { id: Number(id) } });
 
-        if (!existing || existing.userId !== session.user.id) {
+        if (!existing) return NextResponse.json({ error: "Task not found" }, { status: 404 });
+
+        const isAdmin = session.user.role === 'ADMIN';
+        if (existing.userId !== session.user.id && !isAdmin) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 

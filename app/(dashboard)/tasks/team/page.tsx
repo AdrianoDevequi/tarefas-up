@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from "react";
 import TaskBoard from "@/components/TaskBoard";
+import CreateTaskModal from "@/components/CreateTaskModal";
 import { Task } from "@/types";
 import { Users } from "lucide-react";
 
 export default function TeamTasksPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
 
     // Fetch Team Tasks
     const fetchTasks = async () => {
@@ -26,32 +29,46 @@ export default function TeamTasksPage() {
         fetchTasks();
     }, []);
 
-    // Read-only handlers (or limited edit for team tasks?)
-    // For now, let's allow viewing. Editing might be restricted or allowed.
-    // Assuming full access for now, similar to main board.
-
     const handleEditTask = (task: Task) => {
-        // Logic for editing if needed, or simply alert "View Only"
-        // For MVP, maybe just view? 
-        // User asked for "another screen... for team tasks".
-        // Let's implement full board but maybe separate handlers.
-        // Re-using handlers requires duplication or extracting logic.
-        // I will implement basic interaction.
-        console.log("Edit task", task);
+        setEditingTask(task);
+        setIsModalOpen(true);
+    };
+
+    const handleSaveTask = async (taskData: any) => {
+        // Only updates allowed here for now (since creation is usually personal, but maybe admin can create for team?)
+        // Assuming update for existing tasks:
+        const method = editingTask ? "PUT" : "POST";
+        const body = editingTask ? { ...taskData, id: editingTask.id } : taskData;
+
+        try {
+            const res = await fetch("/api/tasks", {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+
+            if (res.ok) {
+                fetchTasks(); // Refresh list
+                setIsModalOpen(false);
+                setEditingTask(null);
+            }
+        } catch (error) {
+            console.error("Error saving task:", error);
+        }
     };
 
     const handleDeleteTask = async (taskId: number) => {
         if (!confirm("Tem certeza? Esta tarefa pertence à equipe.")) return;
-        // ... implementation similar to page.tsx
-        // For brevity, skipping delete implementation on team view unless requested.
-        // Actually, let's keep it simple: Read-only board for team first?
-        // User said "tasks of the team he belongs to appear separately".
-        // Often team tasks are collaborative. I'll allow interaction.
-    };
+        // Optimistic delete
+        setTasks(tasks.filter(t => t.id !== taskId));
 
-    // Quick fix: copy handlers from page.tsx if we want full functionality.
-    // But to keep file clean and since I cannot import handlers easily without refactoring hooks,
-    // I will instantiate them here.
+        try {
+            await fetch(`/api/tasks?id=${taskId}`, { method: "DELETE" });
+        } catch (error) {
+            console.error("Error deleting task:", error);
+            fetchTasks();
+        }
+    };
 
     const handleTaskMove = async (taskId: number, newStatus: any) => {
         // Optimistic
@@ -127,8 +144,17 @@ export default function TeamTasksPage() {
                 tasks={filteredTasks}
                 onTaskMove={handleTaskMove}
                 onQuickAction={handleQuickAction}
-                onEdit={() => { }}
-                onDelete={() => { }}
+                onEdit={handleEditTask}
+                onDelete={handleDeleteTask}
+            />
+
+            {/* Edit/Create Modal */}
+            <CreateTaskModal
+                isOpen={isModalOpen}
+                onClose={() => { setIsModalOpen(false); setEditingTask(null); }}
+                onSave={handleSaveTask}
+                taskToEdit={editingTask}
+                startWithMagic={false}
             />
         </div>
     );

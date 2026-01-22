@@ -92,7 +92,7 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
             </div>
 
             {/* Quick Actions - Always visible on mobile (touch), hover on desktop */}
-            <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-auto">
+            <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-auto mt-3">
                 {/* Edit */}
                 <button
                     onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}

@@ -11,7 +11,7 @@ interface TaskBoardProps {
     onTaskMove: (taskId: number, newStatus: TaskStatus) => void;
     onQuickAction: (task: Task) => void;
     onEdit: (task: Task) => void;
-    onDelete: (taskId: number) => void;
+    onDelete?: (taskId: number) => void;
 }
 
 export default function TaskBoard({ tasks, onTaskMove, onQuickAction, onEdit, onDelete }: TaskBoardProps) {
@@ -116,7 +116,7 @@ export default function TaskBoard({ tasks, onTaskMove, onQuickAction, onEdit, on
 }
 
 // Helper Column Component for standard vertical lists
-function Column({ title, status, tasks, color, onQuickAction, onEdit, onDelete }: { title: string, status: string, tasks: Task[], color: string, onQuickAction: any, onEdit: any, onDelete: any }) {
+function Column({ title, status, tasks, color, onQuickAction, onEdit, onDelete }: { title: string, status: string, tasks: Task[], color: string, onQuickAction: any, onEdit: any, onDelete?: any }) {
     return (
         <div className="flex-1 flex flex-col bg-secondary/30 rounded-2xl border border-border/50 backdrop-blur-sm h-full">
             <div className="p-4 flex items-center justify-between border-b border-white/5">

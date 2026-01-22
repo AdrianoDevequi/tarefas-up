@@ -149,7 +149,7 @@ export default function Home() {
         onTaskMove={handleTaskMove}
         onQuickAction={handleQuickAction}
         onEdit={handleEditTask}
-        onDelete={handleDeleteTask}
+        onDelete={userRole === 'ADMIN' ? handleDeleteTask : undefined}
       />
 
       {userRole === 'ADMIN' && <UpcomingEventsWidget />}

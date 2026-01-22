@@ -105,13 +105,15 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
                 </button>
 
                 {/* Delete */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); onDelete?.(task.id); }}
-                    className="p-1.5 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-md transition-colors"
-                    title="Excluir"
-                >
-                    <Trash2 size={14} />
-                </button>
+                {onDelete && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+                        className="p-1.5 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-md transition-colors"
+                        title="Excluir"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                )}
 
                 <div className="w-px h-3 bg-border mx-1" />
 

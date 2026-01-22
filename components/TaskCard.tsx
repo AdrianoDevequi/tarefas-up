@@ -82,50 +82,61 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
                     )}
                 </div>
 
-                {/* Quick Actions - Always visible on mobile (touch), hover on desktop */}
-                <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-auto">
-                    {/* Edit */}
+                {/* Responsible User Indicator */}
+                {task.user && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary/50 border border-border/50 text-xs text-muted-foreground max-w-[120px]" title={`Responsável: ${task.user.name}`}>
+                        <div className="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[8px] font-bold border border-purple-500/30 shrink-0">
+                            {task.user.name?.[0]?.toUpperCase() || "U"}
+                        </div>
+                        <span className="truncate">{task.user.name.split(' ')[0]}</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Quick Actions - Always visible on mobile (touch), hover on desktop */}
+            <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-auto">
+                {/* Edit */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}
+                    className="p-1.5 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-md transition-colors"
+                    title="Editar"
+                >
+                    <Pencil size={14} />
+                </button>
+
+                {/* Delete */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); onDelete?.(task.id); }}
+                    className="p-1.5 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-md transition-colors"
+                    title="Excluir"
+                >
+                    <Trash2 size={14} />
+                </button>
+
+                <div className="w-px h-3 bg-border mx-1" />
+
+                {task.status !== 'DONE' && (
                     <button
-                        onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}
+                        onClick={(e) => { e.stopPropagation(); onQuickAction?.(task); }}
+                        title="Concluir"
+                        className="p-1.5 hover:bg-green-500/10 text-muted-foreground hover:text-green-500 rounded-md transition-colors"
+                    >
+                        <div className="w-4 h-4 rounded-full border border-current" />
+                    </button>
+                )}
+                {task.status === 'DONE' && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onQuickAction?.(task); }}
+                        title="Reativar"
                         className="p-1.5 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-md transition-colors"
-                        title="Editar"
                     >
-                        <Pencil size={14} />
+                        <div className="w-4 h-4 rounded-full border border-current flex items-center justify-center">
+                            <div className="w-2 h-2 bg-current rounded-full" />
+                        </div>
                     </button>
-
-                    {/* Delete */}
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onDelete?.(task.id); }}
-                        className="p-1.5 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-md transition-colors"
-                        title="Excluir"
-                    >
-                        <Trash2 size={14} />
-                    </button>
-
-                    <div className="w-px h-3 bg-border mx-1" />
-
-                    {task.status !== 'DONE' && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onQuickAction?.(task); }}
-                            title="Concluir"
-                            className="p-1.5 hover:bg-green-500/10 text-muted-foreground hover:text-green-500 rounded-md transition-colors"
-                        >
-                            <div className="w-4 h-4 rounded-full border border-current" />
-                        </button>
-                    )}
-                    {task.status === 'DONE' && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onQuickAction?.(task); }}
-                            title="Reativar"
-                            className="p-1.5 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-md transition-colors"
-                        >
-                            <div className="w-4 h-4 rounded-full border border-current flex items-center justify-center">
-                                <div className="w-2 h-2 bg-current rounded-full" />
-                            </div>
-                        </button>
-                    )}
-                </div>
+                )}
             </div>
         </div>
+        </div >
     );
 }

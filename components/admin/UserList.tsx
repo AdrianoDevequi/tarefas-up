@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Edit2, Shield, User } from "lucide-react";
+import { Edit2, Shield, User, Plus } from "lucide-react";
 
 export default function UserList({ users, teams, onDataChange }: { users: any[], teams: any[], onDataChange: () => void }) {
     const [editingUser, setEditingUser] = useState<any>(null);
@@ -52,8 +52,8 @@ export default function UserList({ users, teams, onDataChange }: { users: any[],
                                 <td className="px-6 py-4 text-muted-foreground">{user.email}</td>
                                 <td className="px-6 py-4">
                                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'ADMIN'
-                                            ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                                            : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                                        : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                                         }`}>
                                         {user.role === 'ADMIN' ? <Shield size={12} /> : <User size={12} />}
                                         {user.role}

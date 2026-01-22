@@ -76,6 +76,18 @@ export default function TeamTasksPage() {
     };
 
 
+    const [selectedUser, setSelectedUser] = useState<string>("ALL");
+
+    // Extract unique users from tasks
+    const uniqueUsers = Array.from(new Set(tasks.map(t => t.user?.id).filter(Boolean))).map(id => {
+        return tasks.find(t => t.user?.id === id)?.user;
+    }).filter(Boolean);
+
+    // Filtered Tasks
+    const filteredTasks = selectedUser === "ALL"
+        ? tasks
+        : tasks.filter(t => t.user?.id === selectedUser);
+
     return (
         <div className="h-full flex flex-col">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
@@ -92,13 +104,30 @@ export default function TeamTasksPage() {
                         Visualize o que sua equipe está trabalhando.
                     </p>
                 </div>
+
+                {/* Filter Dropdown */}
+                <div className="flex items-center gap-3">
+                    <span className="text-sm text-muted-foreground hidden md:inline">Filtrar por:</span>
+                    <select
+                        value={selectedUser}
+                        onChange={(e) => setSelectedUser(e.target.value)}
+                        className="bg-card border border-border text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 min-w-[200px]"
+                    >
+                        <option value="ALL">Todos da Equipe</option>
+                        {uniqueUsers.map(user => (
+                            <option key={user?.id} value={user?.id}>
+                                {user?.name || "Usuário"}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             <TaskBoard
-                tasks={tasks}
+                tasks={filteredTasks}
                 onTaskMove={handleTaskMove}
                 onQuickAction={handleQuickAction}
-                onEdit={() => { }} // No edit modal for now to act as "View/Move Only" or simply because duplicating the modal state is complex given context.
+                onEdit={() => { }}
                 onDelete={() => { }}
             />
         </div>

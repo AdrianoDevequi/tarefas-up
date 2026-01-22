@@ -128,21 +128,38 @@ export async function PUT(req: Request) {
         const body = await req.json();
         const { id, status, title, description, dueDate, estimatedTime } = body;
 
-        // Ensure ownership
+        // Ensure ownership OR Admin
         const existing = await prisma.task.findUnique({ where: { id: Number(id) } });
-        if (!existing || existing.userId !== session.user.id) {
+        if (!existing) return NextResponse.json({ error: "Task not found" }, { status: 404 });
+
+        const isAdmin = session.user.role === 'ADMIN';
+        if (existing.userId !== session.user.id && !isAdmin) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        // Prepare update data
+        const updateData: any = {
+            status,
+            title,
+            description,
+            dueDate: dueDate ? new Date(dueDate) : undefined,
+            estimatedTime
+        };
+
+        // Allow Admin to reassign task
+        // Note: The frontend sends 'assignedUserId', but Prisma expects 'userId'
+        // We only allow this change if the user is an ADMIN
+        if (isAdmin && (body.assignedUserId || body.userId)) {
+            // Prefer assignedUserId from frontend, fallback to userId if direct API usage
+            const newOwnerId = body.assignedUserId || body.userId;
+            if (newOwnerId && newOwnerId !== existing.userId) {
+                updateData.userId = newOwnerId;
+            }
         }
 
         const task = await prisma.task.update({
             where: { id: Number(id) },
-            data: {
-                status,
-                title,
-                description,
-                dueDate: dueDate ? new Date(dueDate) : undefined,
-                estimatedTime
-            },
+            data: updateData,
         });
 
         return NextResponse.json(task);

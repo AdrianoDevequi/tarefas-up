@@ -306,7 +306,12 @@ export default function CreateTaskModal({ isOpen, onClose, onSave, taskToEdit, s
                         <div className="bg-muted/30 rounded-xl p-6 border border-border/50 min-h-[120px] max-h-[65vh] overflow-y-auto">
                             {description ? (
                                 <p className="text-lg leading-relaxed whitespace-pre-wrap text-foreground/90 font-medium">
-                                    {description}
+                                    {description.split(/(\*\*.*?\*\*)/g).map((part, i) => {
+                                        if (part.startsWith('**') && part.endsWith('**')) {
+                                            return <strong key={i} className="text-foreground">{part.slice(2, -2)}</strong>;
+                                        }
+                                        return part;
+                                    })}
                                 </p>
                             ) : (
                                 <p className="text-muted-foreground italic opacity-50">Sem descrição.</p>

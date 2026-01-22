@@ -34,10 +34,14 @@ export async function POST(req: Request) {
 
             Extract the task details and return ONLY a valid JSON object with the following fields:
             - title: A concise summary of the task (max 50 chars).
-            - description: A clear description of what needs to be done based on the conversation/text. Format it nicely.
+            - description: A clear description of what needs to be done based on the conversation/text.
+              IMPORTANT FORMATTING RULES:
+              1. Use **bold** syntax (double asterisks) to highlight important names, dates, values, or key terms.
+              2. Use double line breaks (\n\n) to separate paragraphs strictly. Do not produce long blocks of text without spacing.
+              3. Keep it professional and organized.
             - estimatedTime: Make a best guess based on complexity ("Rápido", "Mediano", or "Demorado"). defaults to "Mediano".
             
-            Do NOT return markdown formatting (like \`\`\`json). Just the raw JSON string.
+            Do NOT return markdown formatting for the JSON itself (like \`\`\`json). Just the raw JSON string.
             Translate everything to Portuguese (Brazil).
         `;
 

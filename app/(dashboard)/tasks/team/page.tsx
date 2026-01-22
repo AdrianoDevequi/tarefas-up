@@ -140,13 +140,48 @@ export default function TeamTasksPage() {
                 </div>
             </div>
 
-            <TaskBoard
-                tasks={filteredTasks}
-                onTaskMove={handleTaskMove}
-                onQuickAction={handleQuickAction}
-                onEdit={handleEditTask}
-                onDelete={handleDeleteTask}
-            />
+            {/* Content Grouped by Team */}
+            {Object.entries(
+                tasks.reduce((acc, task) => {
+                    const teamName = (task.user as any)?.team?.name || "Sem Equipe";
+                    if (!acc[teamName]) acc[teamName] = [];
+                    acc[teamName].push(task);
+                    return acc;
+                }, {} as Record<string, Task[]>)
+            ).map(([teamName, teamTasks]) => {
+                // Apply User Filter to this team's tasks if active
+                const filteredTeamTasks = selectedUser === "ALL"
+                    ? teamTasks
+                    : teamTasks.filter(t => t.user?.id === selectedUser);
+
+                if (filteredTeamTasks.length === 0) return null;
+
+                return (
+                    <div key={teamName} className="mb-10 animate-in fade-in slide-in-from-bottom-5">
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-3 text-foreground/80 border-b border-border/50 pb-2">
+                            <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-sm uppercase tracking-wider">
+                                {teamName}
+                            </span>
+                            <span className="text-xs text-muted-foreground font-normal">
+                                {filteredTeamTasks.length} {filteredTeamTasks.length === 1 ? 'tarefa' : 'tarefas'}
+                            </span>
+                        </h2>
+                        <TaskBoard
+                            tasks={filteredTeamTasks}
+                            onTaskMove={handleTaskMove}
+                            onQuickAction={handleQuickAction}
+                            onEdit={handleEditTask}
+                            onDelete={handleDeleteTask}
+                        />
+                    </div>
+                )
+            })}
+
+            {tasks.length === 0 && !isLoading && (
+                <div className="text-center py-20 text-muted-foreground">
+                    <p>Nenhuma tarefa encontrada.</p>
+                </div>
+            )}
 
             {/* Edit/Create Modal */}
             <CreateTaskModal

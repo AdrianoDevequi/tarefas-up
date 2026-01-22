@@ -26,7 +26,10 @@ export async function GET(req: Request) {
             // Request says: "team tasks ... appear separately from collaborator tasks"
             // Typically "Team Board" shows everyone's tasks. "My Tasks" shows mine.
 
-            if (teamId) {
+            if (role === 'ADMIN') {
+                // Admin sees ALL tasks from ALL teams
+                whereClause = {};
+            } else if (teamId) {
                 whereClause = {
                     user: { teamId: teamId }
                 };
@@ -55,7 +58,15 @@ export async function GET(req: Request) {
             orderBy: { createdAt: "desc" },
             include: {
                 user: {
-                    select: { id: true, name: true, image: true }
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                        // Include Team info for grouping
+                        team: {
+                            select: { id: true, name: true }
+                        }
+                    }
                 }
             }
         });

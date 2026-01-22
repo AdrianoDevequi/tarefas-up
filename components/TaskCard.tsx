@@ -94,13 +94,15 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
             {/* Quick Actions - Always visible on mobile (touch), hover on desktop */}
             <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-auto mt-3">
                 {/* Edit */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}
-                    className="p-1.5 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-md transition-colors"
-                    title="Editar"
-                >
-                    <Pencil size={14} />
-                </button>
+                {onEdit && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onEdit(task); }}
+                        className="p-1.5 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-md transition-colors"
+                        title="Editar"
+                    >
+                        <Pencil size={14} />
+                    </button>
+                )}
 
                 {/* Delete */}
                 {onDelete && (

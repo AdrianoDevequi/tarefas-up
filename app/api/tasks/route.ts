@@ -59,7 +59,21 @@ export async function POST(req: Request) {
         if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         const body = await req.json();
-        const { title, description, dueDate, status, estimatedTime } = body;
+        const { title, description, dueDate, status, estimatedTime, assignedUserId } = body;
+
+        // Default to creator
+        let targetUserId = session.user.id;
+
+        // If assignment is requested, check if creator is ADMIN
+        if (assignedUserId && assignedUserId !== session.user.id) {
+            if (session.user.role === 'ADMIN') {
+                targetUserId = assignedUserId;
+            } else {
+                // Ignore assignment attempt if not admin, or return 403? 
+                // Silently ignoring is safer/easier for now, or could throw error.
+                // Let's stick to default behavior (assign to self) if not allowed.
+            }
+        }
 
         const task = await prisma.task.create({
             data: {
@@ -68,7 +82,7 @@ export async function POST(req: Request) {
                 dueDate: new Date(dueDate), // Ensure Date object
                 status: status || "TODO",
                 estimatedTime,
-                userId: session.user.id,
+                userId: targetUserId,
             },
         });
 

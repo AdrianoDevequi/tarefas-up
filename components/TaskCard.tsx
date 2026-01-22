@@ -84,7 +84,7 @@ export default function TaskCard({ task, onQuickAction, onEdit, onDelete }: Task
 
                 {/* Responsible User Indicator */}
                 {task.user && (
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary/50 border border-border/50 text-xs text-muted-foreground max-w-[120px]" title={`Responsável: ${task.user.name}`}>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary/50 border border-border/50 text-xs text-muted-foreground max-w-[120px]" title={`Responsável: ${task.user.name || "Usuário"}`}>
                         <div className="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[8px] font-bold border border-purple-500/30 shrink-0">
                             {task.user.name?.[0]?.toUpperCase() || "U"}
                         </div>

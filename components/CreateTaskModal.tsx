@@ -25,12 +25,21 @@ export default function CreateTaskModal({ isOpen, onClose, onSave, taskToEdit, s
     const [estimatedTime, setEstimatedTime] = useState("");
     const [assignedUserId, setAssignedUserId] = useState("");
     const [users, setUsers] = useState<any[]>([]);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
     const titleInputRef = useRef<HTMLInputElement>(null);
 
-    // Fetch users (Admin check implied by API response)
+    // Fetch users and current user ID
     useEffect(() => {
         if (isOpen) {
+            // Fetch Current User
+            fetch("/api/auth/me")
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data?.id) setCurrentUserId(data.id);
+                });
+
+            // Fetch All Users
             fetch("/api/admin/users")
                 .then(res => {
                     if (res.ok) return res.json();
@@ -42,6 +51,9 @@ export default function CreateTaskModal({ isOpen, onClose, onSave, taskToEdit, s
                 .catch(() => setUsers([])); // Silently fail if not admin
         }
     }, [isOpen]);
+
+    // Filtered users list (exclude current user)
+    const filteredUsers = users.filter(u => u.id !== currentUserId);
 
     useEffect(() => {
         if (isOpen) {
@@ -373,7 +385,7 @@ export default function CreateTaskModal({ isOpen, onClose, onSave, taskToEdit, s
                                     className="w-full bg-muted/50 border border-input rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground transition-all appearance-none"
                                 >
                                     <option value="" className="text-black dark:text-white bg-white dark:bg-slate-950">Eu mesmo (criador)</option>
-                                    {users.map((u: any) => (
+                                    {filteredUsers.map((u: any) => (
                                         <option key={u.id} value={u.id} className="text-black dark:text-white bg-white dark:bg-slate-950">
                                             {u.name} {u.role === 'ADMIN' ? '(Admin)' : ''}
                                         </option>
